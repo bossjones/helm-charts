@@ -5,3 +5,4 @@ apply-elasticsearch:
 
 delete-elasticsearch:
 	helm uninstall elasticsearch
+	kubectl get pods --namespace=default -l app=elasticsearch-master -w

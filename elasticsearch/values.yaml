@@ -1,3 +1,5 @@
+# helm install elasticsearch ./helm-charts/elasticsearch --set imageTag=7.14.1
+# helm install -f values.yaml ./
 ---
 clusterName: "elasticsearch"
 nodeGroup: "master"
@@ -38,7 +40,9 @@ esConfig: {}
 # Extra environment variables to append to this nodeGroup
 # This will be appended to the current 'env:' key. You can use any of the kubernetes env
 # syntax here
-extraEnvs: []
+extraEnvs: {}
+# - name: ES_JAVA_OPTS
+#   value: "-Xms3024 -Xmx3024"
 #  - name: MY_ENVIRONMENT_VAR
 #    value: the_value_goes_here
 
@@ -65,7 +69,7 @@ hostAliases: []
 #  - "bar.local"
 
 image: "docker.elastic.co/elasticsearch/elasticsearch"
-imageTag: "8.0.0-SNAPSHOT"
+imageTag: "7.14.1"
 imagePullPolicy: "IfNotPresent"
 
 podAnnotations: {}
@@ -73,8 +77,13 @@ podAnnotations: {}
 
 # additionals labels
 labels: {}
+# k8s-app: elasticsearch-logging
+# kubernetes.io/cluster-service: "true"
+# addonmanager.kubernetes.io/mode: Reconcile
+# kubernetes.io/name: "Elasticsearch"
+# boss-part-of: efk
 
-esJavaOpts: "" # example: "-Xmx1g -Xms1g"
+esJavaOpts: "-Xmx1g -Xms1g" # example: "-Xmx1g -Xms1g"
 
 resources:
   requests:
@@ -98,7 +107,7 @@ volumeClaimTemplate:
   accessModes: [ "ReadWriteOnce" ]
   resources:
     requests:
-      storage: 30Gi
+      storage: 2Gi
 
 rbac:
   create: false
@@ -181,7 +190,13 @@ transportPort: 9300
 
 service:
   enabled: true
-  labels: {}
+  # labels: {}
+  labels:
+    k8s-app: elasticsearch-logging
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+    kubernetes.io/name: "Elasticsearch"
+    boss-part-of: efk
   labelsHeadless: {}
   type: ClusterIP
   nodePort: ""
@@ -238,12 +253,15 @@ tolerations: []
 # Enabling this will publically expose your Elasticsearch instance.
 # Only enable this if you have security enabled on your cluster
 ingress:
-  enabled: false
-  annotations: {}
+  enabled: true
+  # annotations: {}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: \"false\"
+    traefik.frontend.rule.type: PathPrefix
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: chart-example.local
+    - host: elasticsearch.vmlab.scarlettlab.home
       paths:
         - path: /
   tls: []

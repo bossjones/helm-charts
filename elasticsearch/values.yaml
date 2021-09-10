@@ -1,5 +1,6 @@
 # helm install elasticsearch ./efk-helm-charts/elasticsearch --set imageTag=7.14.1
 # helm install elasticsearch -f ./efk-helm-charts/elasticsearch/values.yaml ./efk-helm-charts/elasticsearch
+# helm install elasticsearch -f ~/dev/bossjones/efk-helm-charts/elasticsearch/values.yaml ~/dev/bossjones/efk-helm-charts/elasticsearch
 ---
 clusterName: "elasticsearch"
 nodeGroup: "master"
@@ -23,8 +24,8 @@ roles:
   - remote_cluster_client
   - transform
 
-replicas: 3
-minimumMasterNodes: 2
+replicas: 1
+minimumMasterNodes: 1
 
 esMajorVersion: ""
 
@@ -83,7 +84,7 @@ labels: {}
 # kubernetes.io/name: "Elasticsearch"
 # boss-part-of: efk
 
-esJavaOpts: "-Xmx1g -Xms1g" # example: "-Xmx1g -Xms1g"
+esJavaOpts: "" # example: "-Xmx1g -Xms1g"
 
 resources:
   requests:
